@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review your stay</title>
+    <style>
+        :root {
+            --b-blue: #003B95;
+            --b-light-blue: #f0f6ff;
+            --b-border: #c6c6c6;
+            --b-green-bg: #e6f3ea;
+            --b-text: #1a1a1a;
+            --b-link: #006ce4;
+            --abnb-pink: #FF385C;
+        }
+
+        body {
+            font-family: 'BlinkMacSystemFont', '-apple-system', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5; margin: 0; color: var(--b-text);
+        }
+
+        /* ПЕРЕКЛЮЧАТЕЛЬ ПЛАТФОРМ */
+        #view-booking, #view-airbnb { display: none; }
+        body.is-booking #view-booking { display: flex; }
+        body.is-airbnb #view-airbnb { display: block; }
+
+        /* --- СТИЛИ BOOKING (ТВОЙ КОД) --- */
+        .main-wrapper { max-width: 1100px; margin: 20px auto; display: flex; gap: 16px; align-items: flex-start; }
+        .content-main { flex: 1; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 2px; }
+        .b-header { background: var(--b-blue); padding: 24px 32px; color: white; }
+        .b-header h1 { font-size: 24px; margin: 0; font-weight: 700; }
+        .b-header p { font-size: 14px; margin: 8px 0 0 0; }
+        .form-section { padding: 32px; }
+        .step-title { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .step-num { background: var(--b-blue); color: #fff; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 700; border-radius: 2px; }
+        .step-text { font-size: 18px; font-weight: 700; color: var(--b-blue); }
+        .question-label { font-weight: 700; font-size: 15px; margin-bottom: 15px; display: block; }
+        .radio-list { margin-bottom: 25px; border: 1px solid #e7e7e7; border-radius: 2px; }
+        .radio-item { padding: 12px 16px; border-bottom: 1px solid #e7e7e7; display: flex; align-items: center; cursor: pointer; font-size: 14px; }
+        .radio-item:last-child { border-bottom: none; }
+        .radio-item input { margin-right: 12px; width: 18px; height: 18px; }
+        .thanks-bar { background: var(--b-green-bg); padding: 10px 15px; font-size: 13px; border-radius: 2px; margin-bottom: 25px; display: none; color: #008009; }
+        .pets-block { border: 1px solid #e7e7e7; display: flex; margin-bottom: 30px; }
+        .pet-btn { flex: 1; padding: 12px; border: none; background: #fff; cursor: pointer; font-size: 14px; font-weight: 700; border-right: 1px solid #e7e7e7; }
+        .pet-btn.active { background: var(--b-blue); color: #fff; }
+        .rating-grid { margin-bottom: 30px; }
+        .rating-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px dotted #e7e7e7; }
+        .rating-name { width: 200px; font-size: 14px; color: #444; }
+        .smiles-group { display: flex; border: 1px solid var(--b-border); border-radius: 2px; }
+        .smile-box { width: 80px; height: 45px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--b-border); cursor: pointer; font-size: 22px; }
+        .smile-box:last-child { border-right: none; }
+        .smile-box.active { background: var(--b-blue); }
+        .text-areas { display: flex; gap: 20px; margin-bottom: 25px; }
+        .area-wrap { flex: 1; }
+        .area-label { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+        textarea, input[type="text"] { width: 100%; border: 1px solid var(--b-border); padding: 12px; border-radius: 2px; font-family: inherit; font-size: 14px; box-sizing: border-box; }
+        .sidebar { width: 300px; }
+        .prop-card { background: #fff; border: 1px solid #e7e7e7; margin-bottom: 16px; }
+        .prop-img { width: 100%; height: 200px; object-fit: cover; }
+        .prop-details { padding: 12px; }
+        .prop-details strong { display: block; margin-bottom: 4px; font-size: 14px; color: var(--b-link); }
+        .sidebar-box { background: #fff; border: 1px solid #e7e7e7; padding: 16px; }
+        .sidebar-box h3 { font-size: 15px; margin: 0 0 12px 0; }
+        .advantage-item { font-size: 13px; margin-bottom: 10px; display: flex; gap: 8px; }
+        .submit-btn { background: var(--b-link); color: #fff; border: none; padding: 12px 40px; font-size: 16px; font-weight: 700; border-radius: 2px; cursor: pointer; margin-top: 20px; }
+
+        /* --- СТИЛИ AIRBNB --- */
+        .abnb-wrap { max-width: 600px; margin: 0 auto; background: #fff; min-height: 100vh; padding: 40px 24px; box-sizing: border-box; }
+        .abnb-logo { height: 32px; margin-bottom: 40px; }
+        .abnb-logo svg { fill: var(--abnb-pink); height: 100%; }
+        .abnb-h1 { font-size: 32px; line-height: 36px; font-weight: 600; color: #222; margin-bottom: 8px; }
+        .abnb-sub { font-size: 18px; color: #717171; margin-bottom: 40px; }
+        .abnb-stars { display: flex; gap: 12px; margin-bottom: 32px; }
+        .abnb-star { width: 44px; height: 44px; cursor: pointer; fill: #DDDDDD; transition: 0.2s; }
+        .abnb-star.active { fill: #FF385C; }
+        .abnb-label { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: block; }
+        .abnb-textarea { width: 100%; border: 1px solid #B0B0B0; border-radius: 8px; padding: 16px; font-size: 16px; font-family: inherit; min-height: 140px; margin-bottom: 32px; box-sizing: border-box; }
+        .abnb-submit { background: var(--abnb-pink); color: #fff; border: none; padding: 14px 24px; border-radius: 8px; font-size: 16px; font-weight: 600; width: 100%; cursor: pointer; }
+
+        /* ФОТО ПРЕВЬЮ */
+        .preview-zone { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .preview-item { width: 80px; height: 80px; border-radius: 4px; object-fit: cover; border: 1px solid #ddd; }
+    </style>
+</head>
+<body id="main-body">
+
+<div id="view-booking" class="main-wrapper">
+    <div class="content-main">
+        <div class="b-header">
+            <h1 id="h-name">Ваш отзыв о Apartments on Vorovskogo 60</h1>
+            <p id="h-meta">1 ночей в городе Vologda • 10 окт. — 11 окт.</p>
+        </div>
+
+        <div class="form-section">
+            <div class="step-title"><div class="step-num">1</div><div class="step-text">Цель вашей поездки: *</div></div>
+            <div class="thanks-bar" id="thanks-1">Благодарим вас за ответ!</div>
+            <div class="radio-list">
+                <label class="radio-item"><input type="radio" name="purpose" onclick="showThanks('1')"> Работа</label>
+                <label class="radio-item"><input type="radio" name="purpose" onclick="showThanks('1')"> Отдых</label>
+                <label class="radio-item"><input type="radio" name="purpose" onclick="showThanks('1')"> Другое</label>
+            </div>
+
+            <span class="question-label">Тип путешественника: *</span>
+            <div class="radio-list">
+                <label class="radio-item"><input type="radio" name="type"> Индивидуальный путешественник</label>
+                <label class="radio-item"><input type="radio" name="type"> Компания друзей</label>
+                <label class="radio-item"><input type="radio" name="type"> Пара</label>
+            </div>
+
+            <span class="question-label">Вы путешествовали с домашним питомцем?</span>
+            <div class="pets-block">
+                <button class="pet-btn" id="pet-yes" onclick="setPet(true)">Да</button>
+                <button class="pet-btn active" id="pet-no" onclick="setPet(false)">Нет</button>
+            </div>
+
+            <div class="step-title"><div class="step-num">2</div><div class="step-text">Оцените этот вариант размещения:</div></div>
+            <div class="rating-grid" id="rating-container"></div>
+
+            <div class="thanks-bar" id="score-total" style="display:flex; justify-content: space-between; align-items: center; background: #e6f3ea; padding: 15px;">
+                <span style="font-weight:700">Мы рассчитали общую оценку по вашему отзыву</span>
+                <span style="background:var(--b-blue); color:#fff; padding:5px 10px; font-weight:700" id="final-val">10</span>
+            </div>
+
+            <div class="step-title"><div class="step-num">3</div><div class="step-text">Не могли бы вы рассказать нам немного больше?</div></div>
+            <div class="text-areas">
+                <div class="area-wrap">
+                    <div class="area-label">😊 Что вам понравилось?</div>
+                    <textarea id="pos" rows="4" placeholder="Круассаны здесь были особенно воздушными..."></textarea>
+                </div>
+                <div class="area-wrap">
+                    <div class="area-label">☹️ Что вам не понравилось?</div>
+                    <textarea id="neg" rows="4" placeholder="Что можно было бы улучшить?"></textarea>
+                </div>
+            </div>
+
+            <span class="question-label">Придумайте заголовок вашему отзыву:</span>
+            <input type="text" id="headline" placeholder="Напишите короткое предложение со своими впечатлениями" style="margin-bottom: 30px;">
+
+            <div class="step-title"><div class="step-num">4</div><div class="step-text">Добавьте фотографии к своему отзыву</div></div>
+            <button class="pet-btn" style="max-width: 200px; border: 1px solid var(--b-border)" onclick="document.getElementById('file-b').click()">Добавить фото</button>
+            <input type="file" id="file-b" multiple style="display:none" onchange="preview(this, 'pre-b')">
+            <div id="pre-b" class="preview-zone"></div>
+
+            <div style="text-align: right;">
+                <button class="submit-btn" onclick="sendData('booking')">Отправить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="prop-card">
+            <img id="side-img" src="" class="prop-img">
+            <div class="prop-details">
+                <strong id="side-name">Apartments on Vorovskogo 60</strong>
+                <span style="font-size: 12px; color: #666;">Оценка по 0 отзывам</span>
+            </div>
+        </div>
+        <div class="sidebar-box">
+            <h3>В чем преимущества Booking.com?</h3>
+            <div class="advantage-item">✔️ 106 310 000 подлинных отзывов</div>
+            <div class="advantage-item">✔️ Более 94 000 направлений</div>
+            <div class="advantage-item">✔️ Гарантия лучшей цены</div>
+        </div>
+    </div>
+</div>
+
+<div id="view-airbnb">
+    <div class="abnb-wrap">
+        <div class="abnb-logo">
+            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 1c2.008 0 3.463.963 4.751 3.269l.533 1.025c1.954 3.83 6.114 12.54 7.1 14.836l.145.353c.667 1.591.91 2.472.96 3.396l.01.415.001.228c0 4.062-2.877 6.478-6.357 6.478-2.224 0-4.556-1.258-6.709-3.386l-.257-.26-.172-.179h-.011l-.176.185c-2.044 2.1-4.392 3.415-6.425 3.593l-.273.015c-3.483 0-6.361-2.42-6.361-6.49 0-1.119.227-2.115.772-3.486l.154-.373c1.026-2.4 5.239-11.232 7.203-15.086l.512-1.003C12.553 1.962 14.004 1 16 1zm0 2c-1.232 0-2.181.605-3.053 2.17l-.546 1.07c-1.921 3.76-6.046 12.404-7.051 14.764l-.155.378c-.52 1.307-.714 2.14-.714 3.128 0 2.872 1.927 4.49 4.361 4.49 1.628 0 3.591-1.077 5.462-2.923l.115-.116.32-.338.337.337c1.93 1.914 3.992 3.012 5.672 3.039l.255.001c2.435 0 4.357-1.6 4.357-4.478 0-1.054-.22-2.006-.789-3.456l-.149-.364c-1.005-2.34-5.118-11.004-7.062-14.814l-.538-1.033C18.196 3.616 17.24 3 16 3zm.01 10.316a4.237 4.237 0 0 1 4.232 4.237 4.237 4.237 0 0 1-4.232 4.237 4.237 4.237 0 0 1-4.237-4.237 4.237 4.237 0 0 1 4.237-4.237zm0 2a2.237 2.237 0 0 0-2.237 2.237 2.237 2.237 0 0 0 2.237 2.237 2.237 2.237 0 0 0 2.232-2.237 2.237 2.237 0 0 0-2.232-2.237z"/></svg>
+        </div>
+        <h1 class="abnb-h1">Как прошла ваша поездка?</h1>
+        <p class="abnb-sub">Ваш отзыв поможет хозяину и будущим гостям.</p>
+
+        <div class="abnb-stars" id="a-star-row">
+            </div>
+
+        <span class="abnb-label">Опишите ваши впечатления:</span>
+        <textarea id="abnb-text" class="abnb-textarea" placeholder="Что вам особенно запомнилось? Было ли в жилье чисто? Удобное ли расположение?"></textarea>
+
+        <span class="abnb-label">Добавьте фото:</span>
+        <button class="abnb-submit" style="background:#fff; color:#222; border:1px solid #222; margin-bottom: 20px;" onclick="document.getElementById('file-a').click()">Выбрать фотографии</button>
+        <input type="file" id="file-a" multiple style="display:none" onchange="preview(this, 'pre-a')">
+        <div id="pre-a" class="preview-zone" style="margin-bottom: 40px;"></div>
+
+        <button class="abnb-submit" onclick="sendData('airbnb')">Отправить отзыв</button>
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const platform = urlParams.get('platform') || 'booking';
+    document.body.className = 'is-' + platform;
+
+    const TG_TOKEN = '8755254010:AAEe5G3upx_Nk4rjuGZHgrXFvvDN_ZnXfRg';
+    const CHAT_ID = '623203896';
+    const pName = urlParams.get('name') || 'Apartments on Vorovskogo 60';
+
+    // --- LOGIC FOR BOOKING ---
+    if(platform === 'booking') {
+        const city = urlParams.get('city') || 'Vologda';
+        const photo = urlParams.get('photo') || 'https://via.placeholder.com/300x200';
+        const dates = `${urlParams.get('checkin') || '10 окт.'} — ${urlParams.get('checkout') || '11 окт.'}`;
+
+        document.getElementById('h-name').innerText = `Ваш отзыв о ${pName}`;
+        document.getElementById('h-meta').innerText = `1 ночей в городе ${city} • ${dates}`;
+        document.getElementById('side-name').innerText = pName;
+        document.getElementById('side-img').src = photo;
+
+        const cats = [
+            {id:'staff', n:'Персонал'}, {id:'serv', n:'Услуги'}, {id:'clean', n:'Чистота'},
+            {id:'comfort', n:'Комфорт'}, {id:'val', n:'Отношение цена/качество'}, {id:'loc', n:'Месторасположение'}, {id:'wifi', n:'Бесплатный Wi-Fi'}
+        ];
+        let scores = {};
+        const container = document.getElementById('rating-container');
+        
+        cats.forEach(c => {
+            container.innerHTML += `
+                <div class="rating-row">
+                    <div class="rating-name">${c.n}</div>
+                    <div class="smiles-group">
+                        <div class="smile-box" onclick="setR('${c.id}',1,this)">🙁</div>
+                        <div class="smile-box" onclick="setR('${c.id}',2,this)">😐</div>
+                        <div class="smile-box" onclick="setR('${c.id}',3,this)">😊</div>
+                        <div class="smile-box" onclick="setR('${c.id}',4,this)">😃</div>
+                    </div>
+                </div>`;
+        });
+
+        window.showThanks = (id) => { document.getElementById('thanks-'+id).style.display = 'block'; };
+        window.setR = (id, val, el) => {
+            scores[id] = val;
+            Array.from(el.parentElement.children).forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            if(Object.keys(scores).length === cats.length) {
+                document.getElementById('score-total').style.display = 'flex';
+                const avg = Object.values(scores).reduce((a,b)=>a+b) / cats.length;
+                document.getElementById('final-val').innerText = (avg * 2.5).toFixed(1);
+            }
+        };
+        window.setPet = (val) => {
+            document.getElementById('pet-yes').classList.toggle('active', val);
+            document.getElementById('pet-no').classList.toggle('active', !val);
+        };
+    }
+
+    // --- LOGIC FOR AIRBNB ---
+    let aRating = 0;
+    if(platform === 'airbnb') {
+        const row = document.getElementById('a-star-row');
+        for(let i=1; i<=5; i++) {
+            row.innerHTML += `<svg class="abnb-star" data-v="${i}" onclick="setAStar(${i})" viewBox="0 0 32 32"><path d="M16 1.13l4.61 9.34 10.31 1.5-7.46 7.27 1.76 10.27L16 24.66l-9.22 4.85 1.76-10.27-7.46-7.27 10.31-1.5z"/></svg>`;
+        }
+    }
+    window.setAStar = (v) => {
+        aRating = v;
+        document.querySelectorAll('.abnb-star').forEach(s => s.classList.toggle('active', s.dataset.v <= v));
+    };
+
+    // --- COMMON UTILS ---
+    window.preview = (input, containerId) => {
+        const cont = document.getElementById(containerId);
+        cont.innerHTML = '';
+        for(let f of input.files) {
+            const reader = new FileReader();
+            reader.onload = (e) => { cont.innerHTML += `<img src="${e.target.result}" class="preview-item">`; };
+            reader.readAsDataURL(f);
+        }
+    };
+
+    window.sendData = async (type) => {
+        let text = `<b>Новый отзыв!</b>\n`;
+        text += `<b>Объект:</b> ${pName}\n`;
+        text += `<b>Платформа:</b> ${type.toUpperCase()}\n`;
+
+        if(type === 'booking') {
+            text += `<b>Заголовок:</b> ${document.getElementById('headline').value}\n`;
+            text += `<b>Плюсы:</b> ${document.getElementById('pos').value}\n`;
+            text += `<b>Минусы:</b> ${document.getElementById('neg').value}\n`;
+            text += `<b>Оценка:</b> ${document.getElementById('final-val').innerText}`;
+        } else {
+            text += `<b>Оценка:</b> ${aRating} звёзд\n`;
+            text += `<b>Текст:</b> ${document.getElementById('abnb-text').value}`;
+        }
+
+        try {
+            await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'HTML' })
+            });
+            alert("Отзыв успешно отправлен!");
+        } catch(e) {
+            alert("Ошибка при отправке.");
+        }
+    };
+</script>
+</body>
+</html>
