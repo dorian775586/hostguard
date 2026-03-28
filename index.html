@@ -234,8 +234,10 @@
     // --- LOGIC FOR BOOKING ---
     if(platform === 'booking') {
         const city = urlParams.get('city') || 'город';
-        // Основное фото из бота
-        const mainPhoto = urlParams.get('photo') || 'https://via.placeholder.com/1024x768?text=No+Photo';
+        
+        // --- ИСПРАВЛЕНИЕ: Декодируем ссылку на фото ---
+        const rawPhoto = urlParams.get('photo');
+        const mainPhoto = rawPhoto ? decodeURIComponent(rawPhoto) : 'https://via.placeholder.com/1024x768?text=No+Photo';
         
         document.getElementById('h-name').innerText = `Ваш отзыв об объекте ${pName}`;
         document.getElementById('side-name').innerText = pName;
@@ -254,7 +256,9 @@
             extraPhotos.split(',').forEach(src => {
                 const trimmedSrc = src.trim();
                 if(trimmedSrc) {
-                    gal.innerHTML += `<img src="${trimmedSrc}" class="mini-img" onclick="document.getElementById('side-img').src='${trimmedSrc}'">`;
+                    // Также декодируем каждое фото в галерее, если нужно
+                    const decodedSrc = decodeURIComponent(trimmedSrc);
+                    gal.innerHTML += `<img src="${decodedSrc}" class="mini-img" onclick="document.getElementById('side-img').src='${decodedSrc}'">`;
                 }
             });
         }

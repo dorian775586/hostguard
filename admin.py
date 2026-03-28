@@ -2,14 +2,14 @@ import asyncio
 import logging
 import qrcode
 import io
-import requests
 import urllib.parse
+import re
 from bs4 import BeautifulSoup
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import Command
 from aiogram.types import BufferedInputFile, ReplyKeyboardMarkup, KeyboardButton
+from curl_cffi import requests
 
-# --- ТВОИ ДАННЫЕ ---
+# --- НАСТРОЙКИ ---
 API_TOKEN = '8755254010:AAEe5G3upx_Nk4rjuGZHgrXFvvDN_ZnXfRg'
 ADMIN_ID = 623203896 
 BASE_URL = "https://hostguard.vercel.app/"
@@ -18,129 +18,114 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
 def get_booking_data(url):
-    """Парсит название и фото с Booking, обходя защиту JS и ошибки NoneType"""
-    
-    # 1. ЖЕЛЕЗОБЕТОННЫЙ ПЛАН Б: Достаем имя из самой ссылки (если парсинг не сработает)
+    """Парсит Booking и вытягивает лучшее фото"""
+    # Запасное имя из URL
     fallback_name = "Apartment"
     try:
-        parsed = urllib.parse.urlparse(url)
-        # Убираем пустые части пути и берем части до .html
-        path_parts = [p for p in parsed.path.split('/') if p]
+        path = urllib.parse.urlparse(url).path
+        path_parts = [p for p in path.split('/') if p]
         for part in path_parts:
             if '.html' in part:
-                raw_name = part.split('.')[0]
-                fallback_name = raw_name.replace('-', ' ').title()
+                fallback_name = part.split('.')[0].replace('-', ' ').title()
                 break
-            elif len(part) > 5: # На случай если ссылки без .html
-                fallback_name = part.replace('-', ' ').title()
-    except:
-        pass
+    except: pass
 
-    # Заголовки для маскировки под реальный браузер
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
-    }
-    
+    # Запасное фото (качественное)
+    photo = "https://cf.bstatic.com/xdata/images/hotel/max1024x768/10332541.jpg"
     name = fallback_name
-    # Красивая картинка-заглушка на случай, если фото не найдено
-    photo = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop"
 
     try:
-        res = requests.get(url, headers=headers, timeout=10)
+        # Имитируем Chrome для обхода заглушки
+        res = requests.get(url, impersonate="chrome110", timeout=12)
         soup = BeautifulSoup(res.text, 'html.parser')
         
-        # Фикс ошибки NoneType: проверяем наличие заголовка страницы
-        page_title = soup.title.string if (soup.title and soup.title.string) else ""
-        
-        # Проверка на блокировку Букингом
-        forbidden_words = ["JavaScript", "Enable", "Access Denied", "Attention Required"]
-        is_blocked = any(word in page_title for word in forbidden_words)
-
-        if not is_blocked:
-            # Ищем название (проверяем несколько возможных тегов)
-            name_tag = (soup.find("h2", {"class": "pp-header__title"}) or 
-                        soup.find("h1") or 
-                        soup.find("meta", property="og:title"))
-            
+        # 1. Ищем название
+        og_title = soup.find("meta", property="og:title")
+        if og_title:
+            name = og_title.get('content')
+        else:
+            name_tag = soup.find("h2", {"class": "pp-header__title"}) or soup.find("h1")
             if name_tag:
-                if name_tag.name == 'meta':
-                    name = name_tag.get('content', name)
-                else:
-                    name = name_tag.text.strip()
-            
-            # Ищем фото
-            photo_tag = soup.find("meta", property="og:image")
-            if photo_tag and photo_tag.get('content'):
-                photo = photo_tag['content']
-                
-    except Exception as e:
-        print(f"Ошибка парсинга (используем план Б): {e}")
+                name = name_tag.text.strip()
+
+        # 2. Ищем фото
+        og_img = soup.find("meta", property="og:image")
+        if og_img:
+            photo = og_img.get('content')
         
-    # Чистим название от мусора типа "Обновленные цены 2026"
-    for junk in ["|", ":", "-", "Цены", "Booking.com"]:
+        # Увеличиваем размер фото, если оно маленькое
+        if "bstatic.com" in photo:
+            photo = re.sub(r'/(max|square|rw)\d*(x\d+)?/', '/max1024x768/', photo)
+
+    except Exception as e:
+        print(f"⚠️ Ошибка парсинга: {e}")
+
+    # Чистим имя от мусора (JS disabled, Booking.com и т.д.)
+    if not name or "JavaScript" in name:
+        name = fallback_name
+    name = " ".join(name.split())
+    for junk in ["|", ":", "-", "Цены", "Booking.com", "Обновленные цены", "Отель"]:
         if junk in name:
             name = name.split(junk)[0].strip()
+
+    # Очищаем URL фото от параметров после знака ?
+    photo = photo.split('?')[0]
+    if photo.startswith('//'):
+        photo = 'https:' + photo
             
     return name, photo
 
-# Обработка /start и кнопок
-@dp.message(F.text.in_({"/start", "/add_booking", "➕ Добавить Booking"}))
+@dp.message(F.text.in_({"/start", "➕ Добавить Booking"}))
 async def start_handler(message: types.Message):
     if message.from_user.id != ADMIN_ID: return
-    
     kb = [[KeyboardButton(text="➕ Добавить Booking")]]
     markup = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
-    await message.answer("Пришли ссылку на объект с Booking.com, и я сделаю QR-код:", reply_markup=markup)
+    await message.answer("Пришли ссылку на отель с Booking.com:", reply_markup=markup)
 
-# Обработка ссылки
 @dp.message(F.text.contains("booking.com"))
 async def link_handler(message: types.Message):
     if message.from_user.id != ADMIN_ID: return
     
-    url = message.text.strip()
-    wait_msg = await message.answer("⌛️ Обхожу защиту и генерирую QR...")
+    input_url = message.text.strip().split("?")[0]
+    wait_msg = await message.answer("⌛️ Обработка данных...")
     
-    name, photo = get_booking_data(url)
+    name, photo = get_booking_data(input_url)
     
-    # Формируем ссылку для твоего сайта на Vercel
+    # Кодируем параметры для безопасной передачи в URL
     params = {
         "platform": "booking",
         "name": name,
         "photo": photo
     }
     
-    # Кодируем параметры, чтобы ссылка не ломалась от пробелов и спецсимволов
-    final_link = f"{BASE_URL}?{urllib.parse.urlencode(params)}"
+    # Генерируем ссылку
+    query_string = urllib.parse.urlencode(params)
+    final_link = f"{BASE_URL}?{query_string}"
     
-    # Создание QR-кода
+    # Генерация QR
     qr = qrcode.QRCode(box_size=10, border=4)
     qr.add_data(final_link)
     qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
     
-    # Подготовка файла для отправки
     bio = io.BytesIO()
-    img.save(bio, format='PNG')
+    qr.make_image(fill_color="black", back_color="white").save(bio, format='PNG')
     bio.seek(0)
-    input_file = BufferedInputFile(bio.read(), filename="qr.png")
     
-    caption = (f"✅ <b>Готово!</b>\n\n"
-               f"🏠 <b>Объект:</b> {name}\n\n"
-               f"🔗 <b>Твоя ссылка (в QR):</b>\n<code>{final_link}</code>")
+    caption = (
+        f"🏠 <b>{name}</b>\n\n"
+        f"🔗 <b>Ссылка:</b>\n<code>{final_link}</code>"
+    )
     
-    await message.answer_photo(photo=input_file, caption=caption, parse_mode='HTML')
+    await message.answer_photo(
+        photo=BufferedInputFile(bio.read(), filename="qr.png"), 
+        caption=caption, 
+        parse_mode='HTML'
+    )
     await wait_msg.delete()
 
 async def main():
-    logging.basicConfig(level=logging.INFO)
-    print("Бот запущен и готов к работе...")
-    # Очистка очереди сообщений
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 if __name__ == '__main__':
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logging.info("Бот остановлен")
+    asyncio.run(main())
