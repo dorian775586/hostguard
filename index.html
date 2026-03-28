@@ -232,15 +232,32 @@
 
     console.log("MAIN PHOTO:", mainPhoto);
 
-    if(platform === 'booking') {
+   if(platform === 'booking') {
         document.getElementById('h-name').innerText = `Ваш отзыв об объекте ${pName}`;
         document.getElementById('side-name').innerText = pName;
         const imgEl = document.getElementById('side-img');
 
-// fallback если не загрузилось
-imgEl.onerror = () => {
-    imgEl.src = "https://via.placeholder.com/600x400?text=No+Image";
-};
+        // 1. Берем сырой URL
+        let rawPhoto = getCleanParam('photo');
+        
+        // 2. Если пусто — ставим заглушку сразу
+        if(!rawPhoto || rawPhoto.includes('placeholder')) {
+            imgEl.src = "https://via.placeholder.com/600x400?text=No+Photo";
+        } else {
+            // 3. Очищаем URL от протоколов, чтобы прокси не путался
+            let cleanUrl = rawPhoto.replace(/^https?:\/\//, '');
+            
+            // 4. Используем агрессивный прокси wsrv.nl
+            // Он обходит большинство блокировок Referer
+            imgEl.src = `https://wsrv.nl/?url=${cleanUrl}&default=https://via.placeholder.com/600x400?text=Error+Loading`;
+        }
+
+        // На случай, если даже прокси не справился
+        imgEl.onerror = () => {
+            if(!imgEl.src.includes('placeholder')) {
+                imgEl.src = "https://via.placeholder.com/600x400?text=Image+Blocked";
+            }
+        };
 
 // иногда Booking блочит → перезапрашиваем
 // 🔥 ЧИНИМ URL
