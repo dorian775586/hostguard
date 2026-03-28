@@ -241,11 +241,11 @@ imgEl.onerror = () => {
 
 // иногда Booking блочит → перезапрашиваем
 setTimeout(() => {
-    imgEl.src = mainPhoto;
+    imgEl.src = "https://images.weserv.nl/?url=" + encodeURIComponent(mainPhoto);
 }, 100);
 
 // основная загрузка
-imgEl.src = mainPhoto;
+imgEl.src = "https://images.weserv.nl/?url=" + encodeURIComponent(mainPhoto);
 
         const cats = [
             {id:'staff', n:'Персонал'}, {id:'serv', n:'Услуги'}, {id:'clean', n:'Чистота'},
