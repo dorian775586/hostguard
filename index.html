@@ -210,6 +210,7 @@
 </div>
 
 <script>
+    console.log("SCRIPT STARTED");
     const urlParams = new URLSearchParams(window.location.search);
     const platform = urlParams.get('platform') || 'booking';
     document.body.className = 'is-' + platform;
