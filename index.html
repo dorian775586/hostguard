@@ -229,6 +229,8 @@
     const pName = getCleanParam('name') || 'Apartments';
     const mainPhoto = getCleanParam('photo') || 'https://via.placeholder.com/600x400?text=No+Photo';
 
+    console.log("MAIN PHOTO:", mainPhoto);
+
     if(platform === 'booking') {
         document.getElementById('h-name').innerText = `Ваш отзыв об объекте ${pName}`;
         document.getElementById('side-name').innerText = pName;
