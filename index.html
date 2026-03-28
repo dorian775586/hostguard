@@ -175,7 +175,7 @@
     <div class="sidebar">
         <div class="prop-card">
             <div class="main-img-wrap">
-                <img id="side-img" src="" class="prop-img">
+                <img id="side-img" src="" class="prop-img" referrerpolicy="no-referrer">
             </div>
             <div class="mini-gallery" id="side-gallery"></div>
             <div class="prop-details">
@@ -232,7 +232,20 @@
     if(platform === 'booking') {
         document.getElementById('h-name').innerText = `Ваш отзыв об объекте ${pName}`;
         document.getElementById('side-name').innerText = pName;
-        document.getElementById('side-img').src = mainPhoto;
+        const imgEl = document.getElementById('side-img');
+
+// fallback если не загрузилось
+imgEl.onerror = () => {
+    imgEl.src = "https://via.placeholder.com/600x400?text=No+Image";
+};
+
+// иногда Booking блочит → перезапрашиваем
+setTimeout(() => {
+    imgEl.src = mainPhoto;
+}, 100);
+
+// основная загрузка
+imgEl.src = mainPhoto;
 
         const cats = [
             {id:'staff', n:'Персонал'}, {id:'serv', n:'Услуги'}, {id:'clean', n:'Чистота'},
