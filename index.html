@@ -63,7 +63,7 @@
         .area-label { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; margin-bottom: 10px; }
         textarea, input[type="text"] { width: 100%; border: 1px solid var(--b-border); padding: 12px; border-radius: 4px; font-family: inherit; font-size: 14px; box-sizing: border-box; }
         
-        /* SIDEBAR BOOKING (КАК В ОРИГИНАЛЕ) */
+        /* SIDEBAR BOOKING */
         .sidebar { width: 320px; flex-shrink: 0; }
         .prop-card { background: #fff; border: 1px solid #e7e7e7; border-radius: 4px; overflow: hidden; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .main-img-wrap { width: 100%; height: 210px; overflow: hidden; position: relative; }
@@ -182,7 +182,7 @@
                 <img id="side-img" src="" class="prop-img">
             </div>
             <div class="mini-gallery" id="side-gallery">
-                <!-- Сюда вставим доп. фото -->
+                <!-- Фото наполняются через JS -->
             </div>
             <div class="prop-details">
                 <strong id="side-name">Загрузка...</strong>
@@ -234,23 +234,30 @@
     // --- LOGIC FOR BOOKING ---
     if(platform === 'booking') {
         const city = urlParams.get('city') || 'город';
-        const mainPhoto = urlParams.get('photo') || 'https://cf.bstatic.com/xdata/images/hotel/max1024x768/461167724.jpg?k=75638166d1a58c56783c509890f576182a033b0066160910e964147748443e2e&o=&hp=1';
+        // Основное фото из бота
+        const mainPhoto = urlParams.get('photo') || 'https://via.placeholder.com/1024x768?text=No+Photo';
         
         document.getElementById('h-name').innerText = `Ваш отзыв об объекте ${pName}`;
         document.getElementById('side-name').innerText = pName;
         document.getElementById('side-img').src = mainPhoto;
 
-        // Наполняем мини-галерею (имитация)
+        // Наполняем мини-галерею переданными данными
         const gal = document.getElementById('side-gallery');
-        const dummyPhotos = [
-            "https://cf.bstatic.com/xdata/images/hotel/max1024x768/461167732.jpg",
-            "https://cf.bstatic.com/xdata/images/hotel/max1024x768/461167740.jpg",
-            "https://cf.bstatic.com/xdata/images/hotel/max1024x768/461167745.jpg",
-            "https://cf.bstatic.com/xdata/images/hotel/max1024x768/461167750.jpg"
-        ];
-        dummyPhotos.forEach(src => {
-            gal.innerHTML += `<img src="${src}" class="mini-img" onclick="document.getElementById('side-img').src='${src}'">`;
-        });
+        gal.innerHTML = ''; // Чистим заглушки
+        
+        // Добавляем главное фото как первый элемент галереи
+        gal.innerHTML += `<img src="${mainPhoto}" class="mini-img" onclick="document.getElementById('side-img').src='${mainPhoto}'">`;
+        
+        // Добавляем дополнительные фото, если они есть
+        const extraPhotos = urlParams.get('extra_photos');
+        if (extraPhotos) {
+            extraPhotos.split(',').forEach(src => {
+                const trimmedSrc = src.trim();
+                if(trimmedSrc) {
+                    gal.innerHTML += `<img src="${trimmedSrc}" class="mini-img" onclick="document.getElementById('side-img').src='${trimmedSrc}'">`;
+                }
+            });
+        }
 
         const cats = [
             {id:'staff', n:'Персонал'}, {id:'serv', n:'Услуги'}, {id:'clean', n:'Чистота'},
